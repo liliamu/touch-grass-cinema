@@ -1,7 +1,7 @@
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 const API_KEY = '39754db5aa208e9eacd1d53d66112eb0';
 const TMDB = 'https://api.themoviedb.org/3';
-const BIG_BUDGET_THRESHOLD = 50_000_000;
+const BIG_BUDGET_THRESHOLD = 49_999_999;
 
 // ─── STUDIO LISTS ─────────────────────────────────────────────────────────────
 const DEFAULT_BLOCKED = `Walt Disney Pictures
@@ -43,22 +43,7 @@ Skydance Media
 Legendary Pictures
 Village Roadshow Pictures`;
 
-const DEFAULT_ALLOWED = `A24
-Neon
-IFC Films
-MUBI
-Annapurna Pictures
-Magnolia Pictures
-Focus Features
-Bleecker Street
-Oscilloscope
-Kino Lorber
-Music Box Films
-Cohen Media Group
-Film Movement
-Grasshopper Film
-GKIDS
-Janus Films`;
+
 
 // ─── LIST HELPERS ─────────────────────────────────────────────────────────────
 function getList(key, def) {
@@ -67,21 +52,16 @@ function getList(key, def) {
 
 function initLists() {
   document.getElementById('blockedStudios').value = getList('blockedStudios', DEFAULT_BLOCKED);
-  document.getElementById('allowedStudios').value = getList('allowedStudios', DEFAULT_ALLOWED);
 }
 
 function saveLists() {
   localStorage.setItem('blockedStudios', document.getElementById('blockedStudios').value);
-  localStorage.setItem('allowedStudios', document.getElementById('allowedStudios').value);
 }
 
 function getBlockedList() {
   return document.getElementById('blockedStudios').value.split('\n').map(s => s.trim().toLowerCase()).filter(Boolean);
 }
 
-function getAllowedList() {
-  return document.getElementById('allowedStudios').value.split('\n').map(s => s.trim().toLowerCase()).filter(Boolean);
-}
 
 function toggleLists() {
   document.getElementById('listsPanel').classList.toggle('open');
@@ -90,40 +70,33 @@ function toggleLists() {
 // is it hollywood logic
 function getVerdict(studios, originalLang, countries, budget) {
   const blockedList = getBlockedList();
-  const allowedList = getAllowedList();
 
   const blockedStudios = studios.filter(s =>
     blockedList.some(b => s.toLowerCase().includes(b) || b.includes(s.toLowerCase()))
   );
-  const safeStudios = studios.filter(s =>
-    allowedList.some(a => s.toLowerCase().includes(a) || a.includes(s.toLowerCase()))
-  );
+
 
   const isForeign = originalLang !== 'en';
   const isUSA = countries.some(c => c.toLowerCase().includes('united states'));
-  const isBigBudget = budget && budget > BIG_BUDGET_THRESHOLD;
-
-  //not from big studio
+  const isBigBudget = budget && budget >= BIG_BUDGET_THRESHOLD;
+  // blocked studio = hard no
   if (blockedStudios.length > 0) {
     return { verdict: '🚫 No', cls: 'blocked', reason: `Produced by: ${blockedStudios.join(', ')}` };
   }
-  //foreign film ok
+  // foreign language = yes
   if (isForeign) {
     return { verdict: '✅ Yes', cls: 'ok', reason: `Foreign language film — original language: ${originalLang.toUpperCase()}` };
   }
-  //indie studio ok
-  if (safeStudios.length > 0 && !isBigBudget) {
-    return { verdict: '✅ Yes', cls: 'ok', reason: `Indie studio: ${safeStudios.join(', ')}` };
-  }
-  //big bugdet + usa = maybe 
-  if (isBigBudget && isUSA) {
-    return { verdict: '🤔 Maybe', cls: 'check', reason: `Big budget US film (${formatBudget(budget)}) — not on blocklist` };
-  }
-  //unknown production (add?)
+// not blocked + low budget = yes
+if (!isBigBudget) {
+  return { verdict: '✅ Yes', cls: 'ok', reason: 'Low budget, not from a blocked studio' };
+}
+  // big budget + no production data = maybe
   if (studios.length === 0) {
-    return { verdict: '🤔 Maybe', cls: 'check', reason: 'No production company data — verify manually' };
+    return { verdict: '🤔 Maybe', cls: 'check', reason: 'No production data' };
   }
-  return { verdict: '🤔 Maybe', cls: 'check', reason: `Unrecognised studio(s): ${studios.join(', ')}` };
+  // big budget usa = maybe
+  return { verdict: '🤔 Maybe', cls: 'check', reason: `Big budget US film (${formatBudget(budget)})` };
 }
 
 // ─── SEARCH ───────────────────────────────────────────────────────────────────
@@ -211,7 +184,6 @@ function formatBudget(n) {
 
 function renderResult(d, credits) {
   const blockedList = getBlockedList();
-  const allowedList = getAllowedList();
 
   const studios   = (d.production_companies || []).map(c => c.name);
   const countries = (d.production_countries || []).map(c => c.name);
@@ -224,12 +196,11 @@ function renderResult(d, credits) {
   const isBigBudget = budget && budget > BIG_BUDGET_THRESHOLD;
 
   const studioFlags = studios.length > 0
-    ? studios.map(s => {
-        const bad  = blockedList.some(b => s.toLowerCase().includes(b) || b.includes(s.toLowerCase()));
-        const good = allowedList.some(a => s.toLowerCase().includes(a) || a.includes(s.toLowerCase()));
-        return `<span class="flag ${bad ? 'bad' : good ? 'good' : 'neutral'}">${s}</span>`;
-      }).join('')
-    : '<span style="color:var(--muted);font-size:0.75rem">Not listed</span>';
+  ? studios.map(s => {
+      const bad = blockedList.some(b => s.toLowerCase().includes(b) || b.includes(s.toLowerCase()));
+      return `<span class="flag ${bad ? 'bad' : 'neutral'}">${s}</span>`;
+    }).join('')
+  : '<span style="color:var(--muted);font-size:0.75rem">Not listed</span>';
 
   const countryFlags = countries.length > 0
     ? countries.map(c => `<span class="flag ${c.toLowerCase().includes('united states') ? 'bad' : 'neutral'}">${c}</span>`).join('')
@@ -277,7 +248,7 @@ function renderResult(d, credits) {
       </div>
     </div>
 
-    ${budgetFormatted ? `<div class="budget-note ${isBigBudget ? 'big' : ''}">Budget: ${budgetFormatted}${isBigBudget ? ' ⚠ over $50M' : ''}</div>` : ''}
+    ${budgetFormatted ? `<div class="budget-note ${isBigBudget ? 'big' : ''}">Budget: ${budgetFormatted}${isBigBudget ? '' : ''}</div>` : ''}
     ${d.overview ? `<p class="plot">${d.overview}</p>` : ''}
 
     <div class="section-title">Top Billed Cast</div>
@@ -291,7 +262,6 @@ function renderResult(d, credits) {
 window.addEventListener('load', () => {
   initLists();
   document.getElementById('blockedStudios').addEventListener('input', saveLists);
-  document.getElementById('allowedStudios').addEventListener('input', saveLists);
   document.getElementById('movieInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') searchMovie();
   });
