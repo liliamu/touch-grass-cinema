@@ -343,11 +343,7 @@
   <p class="subtitle">Is this movie safe for your year?</p>
 </header>
 
-<div class="card api-setup">
-  <label for="apiKey">TMDB API Key</label>
-  <input type="password" id="apiKey" placeholder="Paste your TMDB API key — saved locally, never leaves your browser">
-  <p class="hint">Get a free key at <a href="https://www.themoviedb.org/settings/api" target="_blank">themoviedb.org/settings/api</a> — free account, instant approval.</p>
-</div>
+
 
 <div class="card">
   <div class="search-row">
@@ -376,8 +372,7 @@
 <div class="card" id="result"></div>
 
 <script>
-const DEFAULT_BLOCKED = `
-Walt Disney Pictures
+const DEFAULT_BLOCKED = `Walt Disney Pictures
 Disney+
 Disney Plus
 Marvel Studios
@@ -413,16 +408,12 @@ Apple Original Films
 Netflix
 Netflix Studios
 Skydance Media
-Village Roadshow Pictures
-`;
+Village Roadshow Pictures`;
 
-const DEFAULT_ALLOWED = `
-A24
+const DEFAULT_ALLOWED = `A24
 Neon
 IFC Films
 MUBI
-Annapurna Pictures
-Oscilloscope Laboratories
 Magnolia Pictures
 Focus Features
 Bleecker Street
@@ -432,10 +423,7 @@ Music Box Films
 Cohen Media Group
 Film Movement
 Grasshopper Film
-Janus Films
-GKIDS
-Studio Ghibli
-`;
+Janus Films`;
 
 function getList(key, def) {
   return localStorage.getItem(key) || def;
@@ -467,29 +455,17 @@ function toggleLists() {
 }
 
 window.addEventListener('load', () => {
-  const saved = localStorage.getItem('tmdbKey');
-  if (saved) document.getElementById('apiKey').value = saved;
   initLists();
-
   document.getElementById('movieInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') searchMovie();
   });
-
-  document.getElementById('apiKey').addEventListener('input', () => {
-    localStorage.setItem('tmdbKey', document.getElementById('apiKey').value.trim());
-  });
 });
 
+const API_KEY = '39754db5aa208e9eacd1d53d66112eb0';
+
 async function searchMovie() {
-  const key = document.getElementById('apiKey').value.trim();
   const title = document.getElementById('movieInput').value.trim();
   const resultEl = document.getElementById('result');
-
-  if (!key) {
-    resultEl.style.display = 'block';
-    resultEl.innerHTML = '<div class="error-msg">Please enter your TMDB API key above first.</div>';
-    return;
-  }
   if (!title) return;
 
   resultEl.style.display = 'block';
@@ -497,38 +473,67 @@ async function searchMovie() {
   document.getElementById('searchBtn').disabled = true;
 
   try {
-    // Search
-    const searchRes = await fetch(`https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(title)}&api_key=${key}`);
+    const searchRes = await fetch(`https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(title)}&api_key=${API_KEY}`);
     const searchData = await searchRes.json();
-
-    if (searchData.status_code === 7) {
-      resultEl.innerHTML = '<div class="error-msg">Invalid API key. Double-check your TMDB key above.</div>';
-      return;
-    }
 
     if (!searchData.results || searchData.results.length === 0) {
       resultEl.innerHTML = `<div class="error-msg">No results for "${title}". Try a different spelling or include the year.</div>`;
       return;
     }
 
-    const movieId = searchData.results[0].id;
+    const top = searchData.results.slice(0, 3);
 
-    // Fetch details + credits in parallel
-    const [detailRes, creditsRes] = await Promise.all([
-      fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${key}`),
-      fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${key}`)
-    ]);
-
-    const detail = await detailRes.json();
-    const credits = await creditsRes.json();
-
-    renderResult(detail, credits);
+    if (top.length === 1) {
+      await loadMovie(top[0].id);
+    } else {
+      showPicker(top);
+    }
 
   } catch(e) {
     resultEl.innerHTML = '<div class="error-msg">Network error — check your connection and try again.</div>';
     console.error(e);
   } finally {
     document.getElementById('searchBtn').disabled = false;
+  }
+}
+
+function showPicker(movies) {
+  const resultEl = document.getElementById('result');
+  const items = movies.map(m => {
+    const year = m.release_date ? m.release_date.slice(0, 4) : '????';
+    const poster = m.poster_path
+      ? `<img src="https://image.tmdb.org/t/p/w92${m.poster_path}" alt="${m.title}" style="width:46px;border-radius:3px;flex-shrink:0">`
+      : `<div style="width:46px;height:69px;background:var(--border);border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--muted)">🎬</div>`;
+    return `
+      <div class="picker-item" onclick="loadMovie(${m.id})" style="display:flex;align-items:center;gap:14px;padding:12px;border:1px solid var(--border);border-radius:3px;cursor:pointer;transition:border-color 0.15s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+        ${poster}
+        <div>
+          <div style="font-family:'DM Serif Display',serif;font-size:1rem">${m.title}</div>
+          <div style="font-size:0.7rem;color:var(--muted);margin-top:2px">${year} · ${m.original_language.toUpperCase()}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  resultEl.innerHTML = `
+    <div style="font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Which one?</div>
+    <div style="display:flex;flex-direction:column;gap:8px">${items}</div>
+  `;
+}
+
+async function loadMovie(movieId) {
+  const resultEl = document.getElementById('result');
+  resultEl.innerHTML = '<div class="loading">LOADING...</div>';
+
+  try {
+    const [detailRes, creditsRes] = await Promise.all([
+      fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}`),
+      fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${API_KEY}`)
+    ]);
+    const detail = await detailRes.json();
+    const credits = await creditsRes.json();
+    renderResult(detail, credits);
+  } catch(e) {
+    resultEl.innerHTML = '<div class="error-msg">Failed to load movie details. Try again.</div>';
   }
 }
 
@@ -566,27 +571,27 @@ function renderResult(d, credits) {
   let verdict, verdictClass, verdictReason;
 
   if (blockedStudios.length > 0) {
-    verdict = '🚫 Blocked';
+    verdict = '🚫 No';
     verdictClass = 'blocked';
     verdictReason = `Produced by: ${blockedStudios.join(', ')}`;
   } else if (isForeign) {
-    verdict = '✅ Looks Good';
+    verdict = '✅ Yes';
     verdictClass = 'ok';
     verdictReason = `Foreign language film — original language: ${originalLang.toUpperCase()}`;
   } else if (safeStudios.length > 0 && !isBigBudget) {
-    verdict = '✅ Looks Good';
+    verdict = '✅ Yes';
     verdictClass = 'ok';
     verdictReason = `Indie studio: ${safeStudios.join(', ')}`;
   } else if (isBigBudget && isUSA) {
-    verdict = '🤔 Check Yourself';
+    verdict = '🤔 Maybe';
     verdictClass = 'check';
     verdictReason = `Big budget US film (${formatBudget(budget)}) — not on blocklist but worth verifying`;
   } else if (studios.length === 0) {
-    verdict = '🤔 Check Yourself';
+    verdict = '🤔 Maybe';
     verdictClass = 'check';
     verdictReason = 'No production company data found — verify manually';
   } else {
-    verdict = '🤔 Check Yourself';
+    verdict = '🤔 Maybe';
     verdictClass = 'check';
     verdictReason = `Unrecognised studio(s): ${studios.join(', ')} — you decide`;
   }
@@ -651,7 +656,7 @@ function renderResult(d, credits) {
     ${budgetFormatted ? `<div class="budget-note ${isBigBudget ? 'big' : ''}">Budget: ${budgetFormatted}${isBigBudget ? ' ⚠ over $50M' : ''}</div>` : ''}
     ${d.overview ? `<p class="plot">${d.overview}</p>` : ''}
 
-    <div class="section-title">Top Billed Cast — eyeball these yourself</div>
+    <div class="section-title">Top Billed Cast</div>
     <div class="cast-list">${cast.map(a => `<span class="cast-pill">${a}</span>`).join('')}</div>
 
     <a class="tmdb-link" href="https://www.themoviedb.org/movie/${d.id}" target="_blank">→ Open on TMDB</a>
