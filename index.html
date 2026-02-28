@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Touch Grass Cinema</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -28,13 +28,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 60px 20px;
+    padding: 60px 20px 100px;
   }
 
-  header {
-    text-align: center;
-    margin-bottom: 48px;
-  }
+  header { text-align: center; margin-bottom: 48px; }
 
   h1 {
     font-family: 'DM Serif Display', serif;
@@ -44,10 +41,7 @@
     letter-spacing: -1px;
   }
 
-  h1 span {
-    font-style: italic;
-    color: var(--text);
-  }
+  h1 span { font-style: italic; color: var(--text); }
 
   .subtitle {
     color: var(--muted);
@@ -67,27 +61,7 @@
     margin-bottom: 20px;
   }
 
-  .api-setup label {
-    display: block;
-    font-size: 0.7rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-
-  .api-setup .hint {
-    font-size: 0.7rem;
-    color: var(--muted);
-    margin-top: 8px;
-  }
-
-  .api-setup .hint a {
-    color: var(--accent);
-    text-decoration: none;
-  }
-
-  input[type="text"], input[type="password"] {
+  input[type="text"] {
     width: 100%;
     background: var(--bg);
     border: 1px solid var(--border);
@@ -98,6 +72,8 @@
     padding: 12px 14px;
     outline: none;
     transition: border-color 0.2s;
+    /* prevent iOS zoom on focus */
+    font-size: 16px;
   }
 
   input:focus { border-color: var(--accent); }
@@ -119,6 +95,8 @@
     text-transform: uppercase;
     transition: opacity 0.15s;
     white-space: nowrap;
+    /* bigger tap target on mobile */
+    min-height: 48px;
   }
 
   button:hover { opacity: 0.85; }
@@ -136,54 +114,28 @@
     border: 1px solid;
   }
 
-  .verdict.blocked { border-color: var(--red); background: rgba(224,82,82,0.08); }
-  .verdict.ok { border-color: var(--green); background: rgba(82,201,122,0.08); }
-  .verdict.check { border-color: var(--orange); background: rgba(224,149,82,0.08); }
+  .verdict.blocked { border-color: var(--red);    background: rgba(224,82,82,0.08); }
+  .verdict.ok      { border-color: var(--green);  background: rgba(82,201,122,0.08); }
+  .verdict.check   { border-color: var(--orange); background: rgba(224,149,82,0.08); }
 
-  .verdict-label {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.4rem;
-  }
-
+  .verdict-label { font-family: 'DM Serif Display', serif; font-size: 1.4rem; }
   .verdict.blocked .verdict-label { color: var(--red); }
-  .verdict.ok .verdict-label { color: var(--green); }
-  .verdict.check .verdict-label { color: var(--orange); }
-
+  .verdict.ok      .verdict-label { color: var(--green); }
+  .verdict.check   .verdict-label { color: var(--orange); }
   .verdict-reason { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
 
-  .movie-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.8rem;
-    margin-bottom: 4px;
-  }
+  .movie-title { font-family: 'DM Serif Display', serif; font-size: 1.8rem; margin-bottom: 4px; }
+  .movie-meta  { font-size: 0.72rem; color: var(--muted); margin-bottom: 20px; letter-spacing: 1px; }
 
-  .movie-meta {
-    font-size: 0.72rem;
-    color: var(--muted);
-    margin-bottom: 20px;
-    letter-spacing: 1px;
-  }
-
-  .poster-row {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
-  }
-
+  .poster-row { display: flex; gap: 20px; margin-bottom: 20px; }
   .poster { flex-shrink: 0; }
   .poster img { width: 100px; border-radius: 3px; display: block; }
 
   .poster-placeholder {
-    width: 100px;
-    height: 148px;
-    background: var(--border);
-    border-radius: 3px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--muted);
-    font-size: 1.5rem;
-    flex-shrink: 0;
+    width: 100px; height: 148px;
+    background: var(--border); border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted); font-size: 1.5rem; flex-shrink: 0;
   }
 
   .info-grid {
@@ -196,82 +148,50 @@
 
   .info-item label {
     display: block;
-    font-size: 0.65rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 4px;
+    font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 4px;
   }
 
   .info-item .value { font-size: 0.82rem; line-height: 1.6; }
 
   .flag {
     display: inline-block;
-    font-size: 0.65rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 2px 7px;
-    border-radius: 2px;
-    margin: 2px 2px 0 0;
+    font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 2px; margin: 2px 2px 0 0;
   }
 
-  .flag.bad { background: rgba(224,82,82,0.2); color: var(--red); border: 1px solid rgba(224,82,82,0.3); }
-  .flag.good { background: rgba(82,201,122,0.2); color: var(--green); border: 1px solid rgba(82,201,122,0.3); }
+  .flag.bad     { background: rgba(224,82,82,0.2);   color: var(--red);    border: 1px solid rgba(224,82,82,0.3); }
+  .flag.good    { background: rgba(82,201,122,0.2);  color: var(--green);  border: 1px solid rgba(82,201,122,0.3); }
   .flag.neutral { background: rgba(255,255,255,0.06); color: var(--muted); border: 1px solid var(--border); }
 
   .section-title {
-    font-size: 0.65rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 10px;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
+    font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px; margin-top: 20px;
+    padding-top: 20px; border-top: 1px solid var(--border);
   }
 
   .cast-list { display: flex; flex-wrap: wrap; gap: 8px; }
 
   .cast-pill {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    font-size: 0.75rem;
-    padding: 5px 12px;
-    color: var(--text);
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 20px; font-size: 0.75rem; padding: 5px 12px; color: var(--text);
   }
 
   .loading {
-    text-align: center;
-    padding: 40px;
-    color: var(--muted);
-    font-size: 0.8rem;
-    letter-spacing: 2px;
+    text-align: center; padding: 40px;
+    color: var(--muted); font-size: 0.8rem; letter-spacing: 2px;
   }
 
   .error-msg {
-    color: var(--red);
-    font-size: 0.8rem;
-    padding: 16px;
-    background: rgba(224,82,82,0.08);
-    border: 1px solid rgba(224,82,82,0.2);
-    border-radius: 3px;
+    color: var(--red); font-size: 0.8rem; padding: 16px;
+    background: rgba(224,82,82,0.08); border: 1px solid rgba(224,82,82,0.2); border-radius: 3px;
   }
 
   .lists-toggle {
-    font-size: 0.7rem;
-    color: var(--muted);
-    cursor: pointer;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    text-align: center;
-    padding: 12px;
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    margin-bottom: 20px;
-    transition: color 0.2s;
-    max-width: 640px;
-    width: 100%;
+    font-size: 0.7rem; color: var(--muted); cursor: pointer;
+    letter-spacing: 1px; text-transform: uppercase; text-align: center;
+    padding: 12px; border: 1px solid var(--border); border-radius: 3px;
+    margin-bottom: 20px; transition: color 0.2s; max-width: 640px; width: 100%;
   }
 
   .lists-toggle:hover { color: var(--text); }
@@ -280,58 +200,35 @@
   .lists-panel.open { display: block; }
 
   .list-editor label {
-    display: block;
-    font-size: 0.65rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 6px;
+    display: block; font-size: 0.65rem; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
   }
 
   .list-editor textarea {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.75rem;
-    padding: 12px 14px;
-    outline: none;
-    resize: vertical;
-    min-height: 120px;
-    line-height: 1.6;
-    transition: border-color 0.2s;
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 3px; color: var(--text); font-family: 'DM Mono', monospace;
+    font-size: 0.75rem; padding: 12px 14px; outline: none;
+    resize: vertical; min-height: 120px; line-height: 1.6; transition: border-color 0.2s;
   }
 
   .list-editor textarea:focus { border-color: var(--accent); }
   .list-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
-  .plot {
-    font-size: 0.78rem;
-    color: var(--muted);
-    line-height: 1.6;
-    font-style: italic;
-    margin-top: 12px;
-  }
-
-  .budget-note { font-size: 0.72rem; color: var(--muted); margin-top: 10px; }
+  .plot { font-size: 0.78rem; color: var(--muted); line-height: 1.6; font-style: italic; margin-top: 12px; }
+  .budget-note { font-size: 1rem; color: var(--muted); margin-top: 10px; }
   .budget-note.big { color: var(--orange); }
 
   .tmdb-link {
-    display: inline-block;
-    margin-top: 12px;
-    font-size: 0.7rem;
-    color: var(--accent);
-    text-decoration: none;
-    letter-spacing: 1px;
+    display: inline-block; margin-top: 12px; font-size: 0.7rem;
+    color: var(--accent); text-decoration: none; letter-spacing: 1px;
   }
 
   .tmdb-link:hover { text-decoration: underline; }
 
   @media (max-width: 500px) {
-    .list-grid { grid-template-columns: 1fr; }
-    .info-grid { grid-template-columns: 1fr; }
+    body { padding: 40px 16px 80px; }
+    .list-grid  { grid-template-columns: 1fr; }
+    .info-grid  { grid-template-columns: 1fr; }
     .poster-row { flex-direction: column; }
   }
 </style>
@@ -340,14 +237,12 @@
 
 <header>
   <h1>Touch Grass <span>Cinema</span></h1>
-  <p class="subtitle">Is this movie safe for your year?</p>
+  <p class="subtitle">Hollywood or no? Stay pretentious 😘 </p>
 </header>
-
-
 
 <div class="card">
   <div class="search-row">
-    <input type="text" id="movieInput" placeholder="Type a movie title..." />
+    <input type="text" id="movieInput" placeholder="Type a movie title..." autocomplete="off" />
     <button onclick="searchMovie()" id="searchBtn">Check</button>
   </div>
 </div>
@@ -371,297 +266,6 @@
 
 <div class="card" id="result"></div>
 
-<script>
-const DEFAULT_BLOCKED = `Walt Disney Pictures
-Disney+
-Disney Plus
-Marvel Studios
-Pixar Animation Studios
-Pixar
-20th Century Studios
-20th Century Fox
-Warner Bros. Pictures
-Warner Bros
-New Line Cinema
-HBO Films
-DC Films
-DC Studios
-Universal Pictures
-Universal Studios
-Amblin Entertainment
-DreamWorks Pictures
-DreamWorks Animation
-DreamWorks
-Paramount Pictures
-Paramount Animation
-Sony Pictures
-Columbia Pictures
-TriStar Pictures
-Screen Gems
-Lionsgate
-Lionsgate Films
-MGM
-Metro-Goldwyn-Mayer
-Amazon Studios
-Amazon MGM Studios
-Apple Original Films
-Netflix
-Netflix Studios
-Skydance Media
-Village Roadshow Pictures`;
-
-const DEFAULT_ALLOWED = `A24
-Neon
-IFC Films
-MUBI
-Magnolia Pictures
-Focus Features
-Bleecker Street
-Oscilloscope
-Kino Lorber
-Music Box Films
-Cohen Media Group
-Film Movement
-Grasshopper Film
-Janus Films`;
-
-function getList(key, def) {
-  return localStorage.getItem(key) || def;
-}
-
-function initLists() {
-  document.getElementById('blockedStudios').value = getList('blockedStudios', DEFAULT_BLOCKED);
-  document.getElementById('allowedStudios').value = getList('allowedStudios', DEFAULT_ALLOWED);
-}
-
-function saveLists() {
-  localStorage.setItem('blockedStudios', document.getElementById('blockedStudios').value);
-  localStorage.setItem('allowedStudios', document.getElementById('allowedStudios').value);
-}
-
-document.getElementById('blockedStudios').addEventListener('input', saveLists);
-document.getElementById('allowedStudios').addEventListener('input', saveLists);
-
-function getBlockedList() {
-  return document.getElementById('blockedStudios').value.split('\n').map(s => s.trim().toLowerCase()).filter(Boolean);
-}
-
-function getAllowedList() {
-  return document.getElementById('allowedStudios').value.split('\n').map(s => s.trim().toLowerCase()).filter(Boolean);
-}
-
-function toggleLists() {
-  document.getElementById('listsPanel').classList.toggle('open');
-}
-
-window.addEventListener('load', () => {
-  initLists();
-  document.getElementById('movieInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') searchMovie();
-  });
-});
-
-const API_KEY = '39754db5aa208e9eacd1d53d66112eb0';
-
-async function searchMovie() {
-  const title = document.getElementById('movieInput').value.trim();
-  const resultEl = document.getElementById('result');
-  if (!title) return;
-
-  resultEl.style.display = 'block';
-  resultEl.innerHTML = '<div class="loading">SEARCHING...</div>';
-  document.getElementById('searchBtn').disabled = true;
-
-  try {
-    const searchRes = await fetch(`https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(title)}&api_key=${API_KEY}`);
-    const searchData = await searchRes.json();
-
-    if (!searchData.results || searchData.results.length === 0) {
-      resultEl.innerHTML = `<div class="error-msg">No results for "${title}". Try a different spelling or include the year.</div>`;
-      return;
-    }
-
-    const top = searchData.results.slice(0, 3);
-
-    if (top.length === 1) {
-      await loadMovie(top[0].id);
-    } else {
-      showPicker(top);
-    }
-
-  } catch(e) {
-    resultEl.innerHTML = '<div class="error-msg">Network error — check your connection and try again.</div>';
-    console.error(e);
-  } finally {
-    document.getElementById('searchBtn').disabled = false;
-  }
-}
-
-function showPicker(movies) {
-  const resultEl = document.getElementById('result');
-  const items = movies.map(m => {
-    const year = m.release_date ? m.release_date.slice(0, 4) : '????';
-    const poster = m.poster_path
-      ? `<img src="https://image.tmdb.org/t/p/w92${m.poster_path}" alt="${m.title}" style="width:46px;border-radius:3px;flex-shrink:0">`
-      : `<div style="width:46px;height:69px;background:var(--border);border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--muted)">🎬</div>`;
-    return `
-      <div class="picker-item" onclick="loadMovie(${m.id})" style="display:flex;align-items:center;gap:14px;padding:12px;border:1px solid var(--border);border-radius:3px;cursor:pointer;transition:border-color 0.15s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
-        ${poster}
-        <div>
-          <div style="font-family:'DM Serif Display',serif;font-size:1rem">${m.title}</div>
-          <div style="font-size:0.7rem;color:var(--muted);margin-top:2px">${year} · ${m.original_language.toUpperCase()}</div>
-        </div>
-      </div>`;
-  }).join('');
-
-  resultEl.innerHTML = `
-    <div style="font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Which one?</div>
-    <div style="display:flex;flex-direction:column;gap:8px">${items}</div>
-  `;
-}
-
-async function loadMovie(movieId) {
-  const resultEl = document.getElementById('result');
-  resultEl.innerHTML = '<div class="loading">LOADING...</div>';
-
-  try {
-    const [detailRes, creditsRes] = await Promise.all([
-      fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}`),
-      fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${API_KEY}`)
-    ]);
-    const detail = await detailRes.json();
-    const credits = await creditsRes.json();
-    renderResult(detail, credits);
-  } catch(e) {
-    resultEl.innerHTML = '<div class="error-msg">Failed to load movie details. Try again.</div>';
-  }
-}
-
-function formatBudget(n) {
-  if (!n || n === 0) return null;
-  if (n >= 1_000_000_000) return `$${(n/1_000_000_000).toFixed(1)}B`;
-  if (n >= 1_000_000) return `$${Math.round(n/1_000_000)}M`;
-  return `$${n.toLocaleString()}`;
-}
-
-function renderResult(d, credits) {
-  const blockedList = getBlockedList();
-  const allowedList = getAllowedList();
-
-  const studios = (d.production_companies || []).map(c => c.name);
-  const countries = (d.production_countries || []).map(c => c.name);
-  const languages = (d.spoken_languages || []).map(l => l.english_name);
-  const originalLang = d.original_language;
-  const budget = d.budget;
-
-  const cast = (credits.cast || []).slice(0, 6).map(a => a.name);
-  const director = (credits.crew || []).find(c => c.job === 'Director');
-
-  const blockedStudios = studios.filter(s =>
-    blockedList.some(b => s.toLowerCase().includes(b) || b.includes(s.toLowerCase()))
-  );
-  const safeStudios = studios.filter(s =>
-    allowedList.some(a => s.toLowerCase().includes(a) || a.includes(s.toLowerCase()))
-  );
-
-  const isForeign = originalLang !== 'en';
-  const isUSA = countries.some(c => c.toLowerCase().includes('united states'));
-  const isBigBudget = budget && budget > 50_000_000;
-
-  let verdict, verdictClass, verdictReason;
-
-  if (blockedStudios.length > 0) {
-    verdict = '🚫 No';
-    verdictClass = 'blocked';
-    verdictReason = `Produced by: ${blockedStudios.join(', ')}`;
-  } else if (isForeign) {
-    verdict = '✅ Yes';
-    verdictClass = 'ok';
-    verdictReason = `Foreign language film — original language: ${originalLang.toUpperCase()}`;
-  } else if (safeStudios.length > 0 && !isBigBudget) {
-    verdict = '✅ Yes';
-    verdictClass = 'ok';
-    verdictReason = `Indie studio: ${safeStudios.join(', ')}`;
-  } else if (isBigBudget && isUSA) {
-    verdict = '🤔 Maybe';
-    verdictClass = 'check';
-    verdictReason = `Big budget US film (${formatBudget(budget)}) — not on blocklist but worth verifying`;
-  } else if (studios.length === 0) {
-    verdict = '🤔 Maybe';
-    verdictClass = 'check';
-    verdictReason = 'No production company data found — verify manually';
-  } else {
-    verdict = '🤔 Maybe';
-    verdictClass = 'check';
-    verdictReason = `Unrecognised studio(s): ${studios.join(', ')} — you decide`;
-  }
-
-  const studioFlags = studios.length > 0
-    ? studios.map(s => {
-        const isBlocked = blockedList.some(b => s.toLowerCase().includes(b) || b.includes(s.toLowerCase()));
-        const isSafe = allowedList.some(a => s.toLowerCase().includes(a) || a.includes(s.toLowerCase()));
-        return `<span class="flag ${isBlocked ? 'bad' : isSafe ? 'good' : 'neutral'}">${s}</span>`;
-      }).join('')
-    : '<span style="color:var(--muted);font-size:0.75rem">Not listed</span>';
-
-  const countryFlags = countries.length > 0
-    ? countries.map(c => {
-        const isUS = c.toLowerCase().includes('united states');
-        return `<span class="flag ${isUS ? 'bad' : 'neutral'}">${c}</span>`;
-      }).join('')
-    : '<span style="color:var(--muted);font-size:0.75rem">Unknown</span>';
-
-  const posterHTML = d.poster_path
-    ? `<div class="poster"><img src="https://image.tmdb.org/t/p/w200${d.poster_path}" alt="${d.title}"></div>`
-    : `<div class="poster-placeholder">🎬</div>`;
-
-  const year = d.release_date ? d.release_date.slice(0, 4) : '';
-  const runtime = d.runtime ? `${d.runtime} min` : '';
-  const genres = (d.genres || []).map(g => g.name).join(', ');
-  const budgetFormatted = formatBudget(budget);
-
-  document.getElementById('result').innerHTML = `
-    <div class="verdict ${verdictClass}">
-      <div>
-        <div class="verdict-label">${verdict}</div>
-        <div class="verdict-reason">${verdictReason}</div>
-      </div>
-    </div>
-
-    <div class="movie-title">${d.title}</div>
-    <div class="movie-meta">${[year, runtime, genres].filter(Boolean).join(' · ')}</div>
-
-    <div class="poster-row">
-      ${posterHTML}
-      <div class="info-grid">
-        <div class="info-item">
-          <label>Director</label>
-          <div class="value">${director ? director.name : 'N/A'}</div>
-        </div>
-        <div class="info-item">
-          <label>Country</label>
-          <div class="value">${countryFlags}</div>
-        </div>
-        <div class="info-item">
-          <label>Language</label>
-          <div class="value">${languages.join(', ') || originalLang.toUpperCase()}</div>
-        </div>
-        <div class="info-item">
-          <label>Production</label>
-          <div class="value">${studioFlags}</div>
-        </div>
-      </div>
-    </div>
-
-    ${budgetFormatted ? `<div class="budget-note ${isBigBudget ? 'big' : ''}">Budget: ${budgetFormatted}${isBigBudget ? ' ⚠ over $50M' : ''}</div>` : ''}
-    ${d.overview ? `<p class="plot">${d.overview}</p>` : ''}
-
-    <div class="section-title">Top Billed Cast</div>
-    <div class="cast-list">${cast.map(a => `<span class="cast-pill">${a}</span>`).join('')}</div>
-
-    <a class="tmdb-link" href="https://www.themoviedb.org/movie/${d.id}" target="_blank">→ Open on TMDB</a>
-  `;
-}
-</script>
+<script src="engine.js"></script>
 </body>
 </html>
