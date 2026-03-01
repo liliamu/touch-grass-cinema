@@ -89,7 +89,7 @@ function getVerdict(studios, originalLang, countries, budget) {
   }
 // not blocked + low budget = yes
 if (!isBigBudget) {
-  return { verdict: '✅ Yes', cls: 'ok', reason: 'Low budget, not from a blocked studio' };
+  return { verdict: '✅ Yes', cls: 'ok', reason: 'Not from a blocked studio' };
 }
   // big budget + no production data = maybe
   if (studios.length === 0) {
@@ -191,7 +191,7 @@ function renderResult(d, credits) {
   const budget    = d.budget;
   const cast      = (credits.cast  || []).slice(0, 6).map(a => a.name);
   const director  = (credits.crew  || []).find(c => c.job === 'Director');
-  const letterboxd = d.title.toLowerCase()
+  const letterboxd = d.title.toLowerCase() // letterboxd formating
     .replace(/'/g, '')        // remove apostrophes
     .replace(/[^a-z0-9\s-]/g, '') // remove special chars
     .trim()
