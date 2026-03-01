@@ -191,6 +191,11 @@ function renderResult(d, credits) {
   const budget    = d.budget;
   const cast      = (credits.cast  || []).slice(0, 6).map(a => a.name);
   const director  = (credits.crew  || []).find(c => c.job === 'Director');
+  const letterboxd = d.title.toLowerCase()
+    .replace(/'/g, '')        // remove apostrophes
+    .replace(/[^a-z0-9\s-]/g, '') // remove special chars
+    .trim()
+    .replace(/\s+/g, '-');   // spaces to hyphens
 
   const { verdict, cls, reason } = getVerdict(studios, d.original_language, countries, budget);
   const isBigBudget = budget && budget > BIG_BUDGET_THRESHOLD;
@@ -254,7 +259,8 @@ function renderResult(d, credits) {
     <div class="section-title">Top Billed Cast</div>
     <div class="cast-list">${cast.map(a => `<span class="cast-pill">${a}</span>`).join('')}</div>
 
-    <a class="tmdb-link" href="https://www.themoviedb.org/movie/${d.id}" target="_blank">→ Open on TMDB</a>
+    <a class="letterboxd-link" href="https://letterboxd.com/film/${letterboxd}" target="_blank">→ Open on Letterboxd</a>
+    <a class="letterboxd-link" href="https://letterboxd.com/search/${encodeURIComponent(d.title)}/" target="_blank">→ Search Letterboxd</a>
   `;
 }
 
