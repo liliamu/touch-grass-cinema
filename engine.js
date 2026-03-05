@@ -120,7 +120,7 @@ async function searchMovie() {
 
     // Sort by vote_count 
     const top = [...data.results]
-      .sort((a, b) => (b.vote_count || 0) - (a.vote_count || 0))
+      .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
       .slice(0, 3);
 
     top.length === 1 ? await loadMovie(top[0].id) : showPicker(top);
