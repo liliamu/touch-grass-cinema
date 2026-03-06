@@ -110,7 +110,10 @@ async function searchMovie() {
   document.getElementById('searchBtn').disabled = true;
 
   try {
-    const res = await fetch(`${TMDB}/search/movie?query=${encodeURIComponent(title)}&api_key=${API_KEY}`);
+    const yearMatch = title.match(/\b(19|20)\d{2}\b/);
+    const year = yearMatch ? yearMatch[0] : null;
+    const cleanTitle = title.replace(year || '', '').trim();
+    const res = await fetch(`${TMDB}/search/movie?query=${encodeURIComponent(cleanTitle)}&api_key=${API_KEY}${year ? `&primary_release_year=${year}` : ''}`);
     const data = await res.json();
 
     if (!data.results || data.results.length === 0) {
@@ -123,7 +126,8 @@ async function searchMovie() {
       .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
       .slice(0, 3);
 
-    top.length === 1 ? await loadMovie(top[0].id) : showPicker(top);
+    //top.length === 1 ? await loadMovie(top[0].id) : showPicker(top);
+    top.length === 1 || year ? await loadMovie(top[0].id) : showPicker(top); //shows year if spesified show first result
 
   } catch(e) {
     resultEl.innerHTML = '<div class="error-msg">Network error — check your connection and try again.</div>';
