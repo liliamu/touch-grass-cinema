@@ -70,15 +70,19 @@ function toggleLists() {
 // is it hollywood logic
 function getVerdict(studios, originalLang, countries, budget) {
   const blockedList = getBlockedList();
-
+//match on starts with
   const blockedStudios = studios.filter(s =>
-    blockedList.some(b => s.toLowerCase().includes(b) || b.includes(s.toLowerCase()))
+    blockedList.some(b => s.toLowerCase() === b || s.toLowerCase().startsWith(b) || b.startsWith(s.toLowerCase()))
   );
 
 
   const isForeign = originalLang !== 'en';
   const isUSA = countries.some(c => c.toLowerCase().includes('united states'));
   const isBigBudget = budget && budget >= BIG_BUDGET_THRESHOLD;
+ // foreign + blocked studio = maybe
+  if (isForeign && blockedStudios.length > 0) {
+    return { verdict: '🤔 Maybe', cls: 'check', reason: `Foreign language but produced by: ${blockedStudios.join(', ')}` };
+  }
   // blocked studio = hard no
   if (blockedStudios.length > 0) {
     return { verdict: '🚫 No', cls: 'blocked', reason: `Produced by: ${blockedStudios.join(', ')}` };
@@ -206,7 +210,7 @@ function renderResult(d, credits) {
 
   const studioFlags = studios.length > 0
   ? studios.map(s => {
-      const bad = blockedList.some(b => s.toLowerCase().includes(b) || b.includes(s.toLowerCase()));
+      const bad = blockedList.some(b => s.toLowerCase() === b || s.toLowerCase().startsWith(b) || b.startsWith(s.toLowerCase()));
       return `<span class="flag ${bad ? 'bad' : 'neutral'}">${s}</span>`;
     }).join('')
   : '<span style="color:var(--muted);font-size:0.75rem">Not listed</span>';
