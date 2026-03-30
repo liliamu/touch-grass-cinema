@@ -75,7 +75,6 @@ function getVerdict(studios, originalLang, countries, budget) {
     blockedList.some(b => s.toLowerCase() === b || s.toLowerCase().startsWith(b) || b.startsWith(s.toLowerCase()))
   );
 
-
   const isForeign = originalLang !== 'en';
   const isUSA = countries.some(c => c.toLowerCase().includes('united states'));
   const isBigBudget = budget && budget >= BIG_BUDGET_THRESHOLD;
