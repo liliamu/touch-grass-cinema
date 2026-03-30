@@ -283,6 +283,7 @@ window.addEventListener('load', () => {
   const params = new URLSearchParams(window.location.search);
   const q = params.get('q');
   const id = params.get('id');
+  console.log('q:', q, 'id:', id);
   if (id) {
     if (q) document.getElementById('movieInput').value = q;
     setTimeout(() => loadMovie(id), 100);
