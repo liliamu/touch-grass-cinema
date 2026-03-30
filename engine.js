@@ -286,7 +286,7 @@ window.addEventListener('load', () => {
   console.log('q:', q, 'id:', id);
   if (id) {
     if (q) document.getElementById('movieInput').value = q;
-    setTimeout(() => loadMovie(id), 100);
+    setTimeout(() => loadMovie(Number(id)), 100);
   } else if (q) {
     document.getElementById('movieInput').value = q;
     setTimeout(() => searchMovie(), 100);
