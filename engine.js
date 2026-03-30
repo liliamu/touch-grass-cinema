@@ -169,6 +169,7 @@ function showPicker(movies) {
 
 async function loadMovie(movieId) {
   const resultEl = document.getElementById('result');
+  resultEl.style.display = 'block';  
   resultEl.innerHTML = '<div class="loading">LOADING...</div>';
 
   try {
