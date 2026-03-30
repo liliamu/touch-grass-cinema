@@ -177,6 +177,7 @@ async function loadMovie(movieId) {
       fetch(`${TMDB}/movie/${movieId}/credits?api_key=${API_KEY}`)
     ]);
     renderResult(await detailRes.json(), await creditsRes.json());
+    history.replaceState(null, '', '?q=' + encodeURIComponent(document.getElementById('movieInput').value) + '&id=' + movieId);
   } catch(e) {
     resultEl.innerHTML = '<div class="error-msg">Failed to load movie details. Try again.</div>';
   }
@@ -279,4 +280,14 @@ window.addEventListener('load', () => {
   document.getElementById('movieInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') searchMovie();
   });
+  const params = new URLSearchParams(window.location.search);
+  const q = params.get('q');
+  const id = params.get('id');
+  if (id) {
+    if (q) document.getElementById('movieInput').value = q;
+    setTimeout(() => loadMovie(id), 100);
+  } else if (q) {
+    document.getElementById('movieInput').value = q;
+    setTimeout(() => searchMovie(), 100);
+  }
 });
